@@ -110,9 +110,15 @@ app.post("/messages", async (req, res) => {
     return;
   }
 
-  const formatedMessage = {...message, from: sender, time: dayjs().format("HH:mm:ss")};
+  try {
+    const formatedMessage = {...message, from: sender, time: dayjs().format("HH:mm:ss")};
+  
+    await db.collection("messages").insertOne(formatedMessage);
 
-  res.status(200).send(formatedMessage);
+    res.sendStatus(201);
+  } catch(err) {
+    res.sendStatus(500);
+  }
 });
 
 app.listen(5000);
