@@ -97,6 +97,12 @@ app.get("/participants", async (req, res) => {
 
 // messages route
 
+// verification functions
+
+const isVisualizeAllowed = (message, userName) => {
+  return message.to === userName || message.from === userName || message.to === "Todos"
+}
+
 app.post("/messages", async (req, res) => {
   const message = req.body;
   const { user:sender } = req.headers;
@@ -123,18 +129,21 @@ app.post("/messages", async (req, res) => {
 
 app.get("/messages", async (req, res) => {
   let { limit: qtdMessages } = req.query;
+  const { user: userName } = req.headers;
 
   try {
     const allMessages = await db.collection("messages").find().toArray();
-  
-    if(!qtdMessages) {
-      qtdMessages = allMessages.length;
+
+    const userAllowedMessages = allMessages.filter(message => isVisualizeAllowed(message, userName));
+
+    if(!qtdMessages || qtdMessages > userAllowedMessages.length) {
+      qtdMessages = userAllowedMessages.length;
     }
 
     const lastMessage = qtdMessages;
 
     //get from the last message to the specified limit
-    const messages = [...allMessages].reverse().slice(0, qtdMessages);
+    const messages = [...userAllowedMessages].reverse().slice(0, qtdMessages);
 
     res.status(200).send(messages);
   } catch (err) {
