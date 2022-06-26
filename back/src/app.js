@@ -1,6 +1,6 @@
 import express, { json } from "express";
 import dotenv from "dotenv";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import joi from "joi";
 import cors from "cors";
 import dayjs from "dayjs";
@@ -161,7 +161,18 @@ app.post("/status", async (req, res) => {
       res.sendStatus(404);
       return;
     }
+
+    await db.collection("participants").updateOne(
+      {
+        _id: new ObjectId(registeredParticipant._id)
+      },
+      {
+        $set: { lastStatus: Date.now() }
+      }
+    );
+
   } catch(err) {
+    console.log(err);
     res.sendStatus(500);
   }
 });
