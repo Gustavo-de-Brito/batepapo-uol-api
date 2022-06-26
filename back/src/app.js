@@ -110,7 +110,9 @@ app.post("/messages", async (req, res) => {
     return;
   }
 
-  res.sendStatus(200);
+  const formatedMessage = {...message, from: sender, time: dayjs().format("HH:mm:ss")};
+
+  res.status(200).send(formatedMessage);
 });
 
 app.listen(5000);
