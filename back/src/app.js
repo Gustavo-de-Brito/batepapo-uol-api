@@ -1,9 +1,12 @@
-import express from "express";
+import express, { json } from "express";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
+import joi from "joi";
+import cors from "cors";
 
 dotenv.config();
 
+// Configurantion database
 const client = new MongoClient(process.env.URL_MONGODB);
 
 let db;
@@ -14,10 +17,30 @@ db = client.connect().then(() => {
 
 const app = express();
 
+app.use(json());
+app.use(cors());
+
+// schemas
+
+const userNameSchema = joi.object(
+  {
+    name: joi.string().required()
+  }
+);
+
+// participants route
+
 app.post("/participants", async (req, res) => {
   const userName = req.body;
 
-  res.status(201).send("CRIADO");
+  const validUserName = userNameSchema.validate(userName);
+
+  if(validUserName.error) {
+    res.sendStatus(422);
+    return;
+  }
+
+  res.sendStatus(201);
 });
 
 app.listen(5000);
