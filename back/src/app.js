@@ -73,4 +73,12 @@ app.get("/participants", async (req, res) => {
   res.status(200).send(participants);
 });
 
+// messages route
+
+app.post("/messages", async (req, res) => {
+  const message = req.body;
+
+  res.status(200).send(message);
+});
+
 app.listen(5000);
