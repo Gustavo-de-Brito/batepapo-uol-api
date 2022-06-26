@@ -121,4 +121,10 @@ app.post("/messages", async (req, res) => {
   }
 });
 
+app.get("/messages", async (req, res) => {
+  const messages = await db.collection("messages").find().toArray();
+
+  res.status(200).send(messages);
+});
+
 app.listen(5000);
