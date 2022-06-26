@@ -21,6 +21,16 @@ const app = express();
 app.use(json());
 app.use(cors());
 
+// Custom validations
+
+const isvalidTypeMessage = (type, helper) => {
+  if(type === "message" || type === "private_message") {
+    return true;
+  } else {
+    return helper.message("O tipo da mensagem deve ser 'message' ou 'private_message'");
+  }
+}
+
 // schemas
 
 const userNameSchema = joi.object(
@@ -28,6 +38,18 @@ const userNameSchema = joi.object(
     name: joi.string().required()
   }
 );
+
+const messageSchema = joi.object(
+  {
+    to: joi.string().required(),
+    text: joi.string().required(),
+    type: joi.string().required().custom(isvalidTypeMessage)
+  }
+);
+
+// TODO to e text strings não vazias
+// TODO type só pode ser "message" ou "private_message"
+// TODO from deve ser um participante presente na lista de participantes
 
 // participants route
 
@@ -77,10 +99,18 @@ app.get("/participants", async (req, res) => {
 
 app.post("/messages", async (req, res) => {
   const message = req.body;
-
   const { user:sender } = req.headers;
 
-  res.status(200).send({ ...message, from: sender });
+  const validedMessage = messageSchema.validate(message);
+
+  const registeredSender = await db.collection("participants").findOne( { name:sender }); 
+
+  if(validedMessage.error || !registeredSender) {
+    res.sendStatus(422);
+    return;
+  }
+
+  res.sendStatus(200);
 });
 
 app.listen(5000);
