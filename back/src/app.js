@@ -122,8 +122,12 @@ app.post("/messages", async (req, res) => {
 });
 
 app.get("/messages", async (req, res) => {
-  const { limit: qtdMessages } = req.query;
+  let { limit: qtdMessages } = req.query;
   const messages = await db.collection("messages").find().toArray();
+
+  if(!qtdMessages) {
+    qtdMessages = messages.length;
+  }
 
   res.status(200).send(messages);
 });
