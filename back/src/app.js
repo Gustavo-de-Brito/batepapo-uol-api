@@ -51,7 +51,7 @@ const messageSchema = joi.object(
 // TODO type só pode ser "message" ou "private_message"
 // TODO from deve ser um participante presente na lista de participantes
 
-// participants route
+// /participants route
 
 app.post("/participants", async (req, res) => {
   const userName = req.body;
@@ -95,7 +95,7 @@ app.get("/participants", async (req, res) => {
   res.status(200).send(participants);
 });
 
-// messages route
+// /messages route
 
 // verification functions
 
@@ -149,6 +149,12 @@ app.get("/messages", async (req, res) => {
   } catch (err) {
     res.sendStatus(500);
   }
+});
+
+// /status route
+
+app.post("/status", async (req, res) => {
+  const { user: userName } = req.headers;
 });
 
 app.listen(5000);
