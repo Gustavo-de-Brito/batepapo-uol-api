@@ -78,7 +78,9 @@ app.get("/participants", async (req, res) => {
 app.post("/messages", async (req, res) => {
   const message = req.body;
 
-  res.status(200).send(message);
+  const { user:sender } = req.headers;
+
+  res.status(200).send({ ...message, from: sender });
 });
 
 app.listen(5000);
