@@ -123,13 +123,23 @@ app.post("/messages", async (req, res) => {
 
 app.get("/messages", async (req, res) => {
   let { limit: qtdMessages } = req.query;
-  const messages = await db.collection("messages").find().toArray();
 
-  if(!qtdMessages) {
-    qtdMessages = messages.length;
+  try {
+    const allMessages = await db.collection("messages").find().toArray();
+  
+    if(!qtdMessages) {
+      qtdMessages = allMessages.length;
+    }
+
+    const lastMessage = qtdMessages;
+
+    //get from the last message to the specified limit
+    const messages = [...allMessages].reverse().slice(0, qtdMessages);
+
+    res.status(200).send(messages);
+  } catch (err) {
+    res.sendStatus(500);
   }
-
-  res.status(200).send(messages);
 });
 
 app.listen(5000);
