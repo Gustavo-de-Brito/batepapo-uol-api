@@ -61,15 +61,16 @@ app.post("/participants", async (req, res) => {
       }
     );
 
-    const message = await db.collection("messages").find();
-
-    console.log(message);
-
     res.sendStatus(201);
   } catch (err) {
-
+    res.sendStatus(500);
   }
+});
 
+app.get("/participants", async (req, res) => {
+  const participants = await db.collection("participants").find().toArray();
+
+  res.status(200).send(participants);
 });
 
 app.listen(5000);
