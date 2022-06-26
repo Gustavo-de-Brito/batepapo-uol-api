@@ -40,7 +40,14 @@ app.post("/participants", async (req, res) => {
     return;
   }
 
-  res.sendStatus(201);
+  try {
+    await db.collection("participants").insertOne({ ...userName, lastStatus: Date.now() });
+
+    res.sendStatus(201);
+  } catch (err) {
+
+  }
+
 });
 
 app.listen(5000);
