@@ -47,10 +47,6 @@ const messageSchema = joi.object(
   }
 );
 
-// TODO to e text strings não vazias
-// TODO type só pode ser "message" ou "private_message"
-// TODO from deve ser um participante presente na lista de participantes
-
 // /participants route
 
 app.post("/participants", async (req, res) => {
@@ -142,7 +138,7 @@ app.get("/messages", async (req, res) => {
 
     const lastMessage = qtdMessages;
 
-    //get from the last message to the specified limit
+    //get from the most recent message to the specified limit
     const messages = [...userAllowedMessages].reverse().slice(0, qtdMessages);
 
     res.status(200).send(messages);
@@ -155,6 +151,19 @@ app.get("/messages", async (req, res) => {
 
 app.post("/status", async (req, res) => {
   const { user: userName } = req.headers;
+
+  try {
+    const participants = await db.collection("participants").find().toArray();
+  
+    const registeredParticipant = participants.find(participant => participant.name === userName);
+  
+    if(!registeredParticipant) {
+      res.sendStatus(404);
+      return;
+    }
+  } catch(err) {
+    res.sendStatus(500);
+  }
 });
 
 app.listen(5000);
