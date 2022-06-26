@@ -41,6 +41,13 @@ app.post("/participants", async (req, res) => {
   }
 
   try {
+    const alreadyRegistrated = await db.collection("participants").findOne( userName );
+
+    if(alreadyRegistrated) {
+      res.sendStatus(409);
+      return;
+    }
+
     await db.collection("participants").insertOne({ ...userName, lastStatus: Date.now() });
 
     res.sendStatus(201);
