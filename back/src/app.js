@@ -96,7 +96,7 @@ app.get("/participants", async (req, res) => {
 // verification functions
 
 const isVisualizeAllowed = (message, userName) => {
-  return message.to === userName || message.from === userName || message.to === "Todos"
+  return message.to === userName || message.from === userName || message.type === "message" || message.to === "Todos";
 }
 
 app.post("/messages", async (req, res) => {
