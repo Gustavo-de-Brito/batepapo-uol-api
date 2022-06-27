@@ -178,4 +178,31 @@ app.post("/status", async (req, res) => {
   }
 });
 
+// 
+
+async function removeNotActiveUsers() {
+  const users = await db.collection("participants").find().toArray();
+
+  const currentTime = Date.now();
+
+  const usersToDelete = [];
+
+  for(let i = 0; i < users.length; i++) {
+    const timeDifference = currentTime - users[i].lastStatus;
+    const MAX_LIMIT_TIME = 160000;
+
+    if(timeDifference > MAX_LIMIT_TIME) {
+      usersToDelete.push(users[i]);
+    }
+  }
+
+  for(const user of usersToDelete) {
+    await db.collection("participants").deleteOne(user);
+  }
+
+}
+
+setInterval(removeNotActiveUsers, 15000);
+
+
 app.listen(5000);
