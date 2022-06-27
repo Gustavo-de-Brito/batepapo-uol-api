@@ -197,7 +197,15 @@ async function removeNotActiveUsers() {
   }
 
   for(const user of usersToDelete) {
+    const userOutMessage = {
+      from: user.name,
+      to: 'Todos', text: 'sai da sala...',
+      type: 'status',
+      time: dayjs().format("HH:mm:ss")
+    };
+
     await db.collection("participants").deleteOne(user);
+    await db.collection("messages").insertOne(userOutMessage);
   }
 
 }
